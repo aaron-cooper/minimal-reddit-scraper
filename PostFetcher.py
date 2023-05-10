@@ -35,7 +35,7 @@ class PostFetcher:
     def next(self) -> Post:
         return self.__next__()
     
-    def __next__(self):
+    def __next__(self) -> Post:
         if self._curr == len(self._posts):
             self._fetch()
         self._curr += 1

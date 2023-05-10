@@ -1,27 +1,27 @@
-import requests
-from Post import Post
 import argparse
+from PostFetcher import PostFetcher
+from itertools import takewhile
+from durationutil.parser import parse
+import time
+from sys import stderr
+
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument("subreddit", type=str)
-arg_parser.add_argument("--past", "-p", default="1h")
+arg_parser.add_argument("--age", "-a", default="1h")
 
 args = arg_parser.parse_args()
 
+try:
+    age = parse(args.age)
+except:
+    print("invalid value for --age", file=stderr)
+    exit(1)
 
-url = rf"https://reddit.com/r/{args.subreddit}/new.json"
+age_limit = int(time.time()) - age
 
-r = requests.get(url, headers={'User-agent': 'acs-reddit-scraper'})
+pf = PostFetcher(args.subreddit)
 
-j = r.json()["data"]["children"]
-
-def json_to_post(json):
-    json = json["data"]
-    return Post(json["title"], json["name"], json["created"], json["selftext"])
-
-posts = list(map(json_to_post, j))
-
-for title in map(lambda post: post.title, posts):
-    print(title)
-
+for post in takewhile(lambda p: int(float(p.time)) > age_limit, pf):
+    print(post)
 
