@@ -47,7 +47,8 @@ class PostFetcher:
     def _initial_limits(self):
         limit = _limits[self._which_limit]
         self._which_limit += 1
-        if self._which_limit == len(_limits) - 1:
+        if self._which_limit == len(_limits):
+            self._which_limit -= 1
             self._limit_strat = self._subsequent_limits
         return limit
 
